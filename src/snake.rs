@@ -94,11 +94,11 @@ fn snake_movement(
     // Finalize the movement direction
     head.prev_dir = head.next_dir;
 
-    // Collect all body segment positions in order
-    let body_positions: Vec<_> = body
-        .iter()
-        .map(|&e| *pos_query.get_mut(e).unwrap())
-        .collect();
+    for (next_segment, prev_segment) in body.iter().rev().zip(body.iter().rev().skip(1)) {
+        let prev_pos = *pos_query.get(*prev_segment).unwrap();
+        let mut next_pos = pos_query.get_mut(*next_segment).unwrap();
+        *next_pos = prev_pos;
+    }
     let mut head_pos = pos_query.get_mut(head_entity).unwrap();
     match head.next_dir {
         Direction::Left => {
@@ -114,10 +114,4 @@ fn snake_movement(
             head_pos.y += 1;
         }
     }
-    body_positions
-        .iter()
-        .zip(body.iter().skip(1))
-        .for_each(|(pos, segment)| {
-            *pos_query.get_mut(*segment).unwrap() = *pos;
-        });
 }
