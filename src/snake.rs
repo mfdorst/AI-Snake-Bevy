@@ -1,13 +1,14 @@
 use bevy::{prelude::*, time::FixedTimestep};
 
-use super::components::{Direction, Pos, Size, SnakeHead};
+use super::components::{Direction, *};
 use super::consts::*;
 
 pub struct SnakePlugin;
 
 impl Plugin for SnakePlugin {
     fn build(&self, app: &mut App) {
-        app.add_startup_system(spawn_snake)
+        app.insert_resource(SnakeBody::default())
+            .add_startup_system(spawn_snake)
             .add_system(snake_direction_input.before(snake_movement))
             .add_system_set(
                 SystemSet::new()
@@ -17,8 +18,23 @@ impl Plugin for SnakePlugin {
     }
 }
 
-fn spawn_snake(mut commands: Commands) {
+fn spawn_segment(commands: &mut Commands, pos: Pos) -> Entity {
     commands
+        .spawn_bundle(SpriteBundle {
+            sprite: Sprite {
+                color: SNAKE_TAIL_COLOR,
+                ..default()
+            },
+            ..default()
+        })
+        .insert(SnakeSegment)
+        .insert(pos)
+        .insert(SNAKE_TAIL_SEGMENT_SIZE)
+        .id()
+}
+
+fn spawn_snake(mut commands: Commands, mut snake_body: ResMut<SnakeBody>) {
+    let head = commands
         .spawn_bundle(SpriteBundle {
             sprite: Sprite {
                 color: SNAKE_HEAD_COLOR,
@@ -32,7 +48,19 @@ fn spawn_snake(mut commands: Commands) {
         })
         .insert(SnakeHead::default())
         .insert(SNAKE_HEAD_START_POS)
-        .insert(Size(0.8));
+        .insert(SNAKE_HEAD_SIZE)
+        .id();
+
+    let mut body = Vec::with_capacity(SNAKE_STARTING_LEN);
+    body.push(head);
+
+    for i in 1..SNAKE_STARTING_LEN {
+        body.push(spawn_segment(
+            &mut commands,
+            Pos::new(SNAKE_HEAD_START_POS.x - i as i32, SNAKE_HEAD_START_POS.y),
+        ))
+    }
+    *snake_body = SnakeBody(body);
 }
 
 fn snake_direction_input(

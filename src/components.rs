@@ -6,14 +6,8 @@ pub struct SnakeHead {
     pub next_dir: Direction,
 }
 
-impl SnakeHead {
-    pub fn default() -> Self {
-        Self {
-            prev_dir: Direction::Right,
-            next_dir: Direction::Right,
-        }
-    }
-}
+#[derive(Component)]
+pub struct SnakeSegment;
 
 #[derive(Component)]
 pub struct Size(pub f32);
@@ -33,6 +27,18 @@ pub enum Direction {
     Right,
     Up,
     Down,
+}
+
+#[derive(Default, Deref, DerefMut)]
+pub struct SnakeBody(pub Vec<Entity>);
+
+impl SnakeHead {
+    pub fn default() -> Self {
+        Self {
+            prev_dir: Direction::Right,
+            next_dir: Direction::Right,
+        }
+    }
 }
 
 impl Direction {
