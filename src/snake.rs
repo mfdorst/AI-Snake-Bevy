@@ -85,24 +85,39 @@ fn snake_direction_input(
     }
 }
 
-fn snake_movement(mut head_query: Query<(&mut Pos, &mut SnakeHead)>) {
-    for (mut pos, mut head) in &mut head_query {
-        // Finalize the movement direction
-        head.prev_dir = head.next_dir;
+fn snake_movement(
+    body: ResMut<SnakeBody>,
+    mut head_query: Query<(Entity, &mut SnakeHead)>,
+    mut pos_query: Query<&mut Pos>,
+) {
+    let (head_entity, mut head) = head_query.single_mut();
+    // Finalize the movement direction
+    head.prev_dir = head.next_dir;
 
-        match head.next_dir {
-            Direction::Left => {
-                pos.x -= 1;
-            }
-            Direction::Right => {
-                pos.x += 1;
-            }
-            Direction::Down => {
-                pos.y -= 1;
-            }
-            Direction::Up => {
-                pos.y += 1;
-            }
+    // Collect all body segment positions in order
+    let body_positions: Vec<_> = body
+        .iter()
+        .map(|&e| *pos_query.get_mut(e).unwrap())
+        .collect();
+    let mut head_pos = pos_query.get_mut(head_entity).unwrap();
+    match head.next_dir {
+        Direction::Left => {
+            head_pos.x -= 1;
+        }
+        Direction::Right => {
+            head_pos.x += 1;
+        }
+        Direction::Down => {
+            head_pos.y -= 1;
+        }
+        Direction::Up => {
+            head_pos.y += 1;
         }
     }
+    body_positions
+        .iter()
+        .zip(body.iter().skip(1))
+        .for_each(|(pos, segment)| {
+            *pos_query.get_mut(*segment).unwrap() = *pos;
+        });
 }
