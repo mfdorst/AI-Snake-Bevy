@@ -1,18 +1,20 @@
-use bevy::{prelude::*, time::FixedTimestep};
+use bevy::prelude::*;
 use rand::Rng;
 
-use super::components::{Food, Pos, Size};
+use super::components::*;
 use super::consts::*;
 
 pub struct FoodPlugin;
 
 impl Plugin for FoodPlugin {
     fn build(&self, app: &mut App) {
-        app.add_system_set(
-            SystemSet::new()
-                .with_run_criteria(FixedTimestep::step(1.0))
-                .with_system(food_spawn),
-        );
+        app.add_startup_system(food_spawn).add_system(food_respawn);
+    }
+}
+
+fn food_respawn(commands: Commands, mut eat_event_reader: EventReader<EatEvent>) {
+    if eat_event_reader.iter().next().is_some() {
+        food_spawn(commands);
     }
 }
 
