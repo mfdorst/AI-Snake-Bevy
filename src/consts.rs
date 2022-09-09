@@ -12,8 +12,8 @@ pub const SNAKE_HEAD_SIZE: Size = Size(0.8);
 pub const SNAKE_TAIL_SEGMENT_SIZE: Size = Size(0.65);
 
 // Dimensions
-pub const ARENA_WIDTH: u32 = 30;
-pub const ARENA_HEIGHT: u32 = 30;
+pub const ARENA_WIDTH: u32 = 20;
+pub const ARENA_HEIGHT: u32 = 20;
 pub const WINDOW_SIZE: f32 = 800.0;
 
 // Other
