@@ -15,11 +15,19 @@ pub struct Size(pub f32);
 #[derive(Component)]
 pub struct Food;
 
-#[derive(Component, Clone, Copy, PartialEq, Eq)]
+pub struct EatEvent;
+
+#[derive(Component, Default, Clone, Copy, PartialEq, Eq)]
 pub struct Pos {
     pub x: i32,
     pub y: i32,
 }
+
+#[derive(Default, Deref, DerefMut)]
+pub struct SnakeBody(pub Vec<Entity>);
+
+#[derive(Default)]
+pub struct LastTailPos(pub Pos);
 
 #[derive(Eq, PartialEq, Clone, Copy)]
 pub enum Direction {
@@ -28,9 +36,6 @@ pub enum Direction {
     Up,
     Down,
 }
-
-#[derive(Default, Deref, DerefMut)]
-pub struct SnakeBody(pub Vec<Entity>);
 
 impl SnakeHead {
     pub fn default() -> Self {

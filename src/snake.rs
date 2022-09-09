@@ -8,12 +8,16 @@ pub struct SnakePlugin;
 impl Plugin for SnakePlugin {
     fn build(&self, app: &mut App) {
         app.insert_resource(SnakeBody::default())
+            .insert_resource(LastTailPos::default())
+            .add_event::<EatEvent>()
             .add_startup_system(spawn_snake)
-            .add_system(snake_direction_input.before(snake_movement))
+            .add_system(snake_direction_input.before(snake_move))
             .add_system_set(
                 SystemSet::new()
                     .with_run_criteria(FixedTimestep::step(MOVE_DELAY))
-                    .with_system(snake_movement),
+                    .with_system(snake_move)
+                    .with_system(snake_eat.after(snake_move))
+                    .with_system(snake_grow.after(snake_eat)),
             );
     }
 }
@@ -85,8 +89,9 @@ fn snake_direction_input(
     }
 }
 
-fn snake_movement(
-    body: ResMut<SnakeBody>,
+fn snake_move(
+    body: Res<SnakeBody>,
+    mut last_tail_pos: ResMut<LastTailPos>,
     mut head_query: Query<(Entity, &mut SnakeHead)>,
     mut pos_query: Query<&mut Pos>,
 ) {
@@ -113,5 +118,32 @@ fn snake_movement(
         Direction::Up => {
             head_pos.y += 1;
         }
+    }
+    *last_tail_pos = LastTailPos(*pos_query.get(*body.last().unwrap()).unwrap());
+}
+
+fn snake_eat(
+    mut commands: Commands,
+    mut eat_event_writer: EventWriter<EatEvent>,
+    food_pos_query: Query<(Entity, &Pos), With<Food>>,
+    head_pos_query: Query<&Pos, With<SnakeHead>>,
+) {
+    let head_pos = head_pos_query.single();
+    for (food, food_pos) in &food_pos_query {
+        if food_pos == head_pos {
+            commands.entity(food).despawn();
+            eat_event_writer.send(EatEvent);
+        }
+    }
+}
+
+fn snake_grow(
+    mut commands: Commands,
+    last_tail_pos: Res<LastTailPos>,
+    mut body: ResMut<SnakeBody>,
+    mut eat_event_reader: EventReader<EatEvent>,
+) {
+    if eat_event_reader.iter().next().is_some() {
+        body.push(spawn_segment(&mut commands, last_tail_pos.0));
     }
 }
