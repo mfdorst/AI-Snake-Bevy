@@ -11,12 +11,12 @@ impl Plugin for FoodPlugin {
         app.add_system_set(
             SystemSet::new()
                 .with_run_criteria(FixedTimestep::step(1.0))
-                .with_system(spawn_food),
+                .with_system(food_spawn),
         );
     }
 }
 
-fn spawn_food(mut commands: Commands) {
+fn food_spawn(mut commands: Commands) {
     let mut rng = rand::thread_rng();
     commands
         .spawn_bundle(SpriteBundle {

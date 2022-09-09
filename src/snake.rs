@@ -10,7 +10,7 @@ impl Plugin for SnakePlugin {
         app.insert_resource(SnakeBody::default())
             .insert_resource(LastTailPos::default())
             .add_event::<EatEvent>()
-            .add_startup_system(spawn_snake)
+            .add_startup_system(snake_spawn)
             .add_system(snake_direction_input.before(snake_move))
             .add_system_set(
                 SystemSet::new()
@@ -22,22 +22,7 @@ impl Plugin for SnakePlugin {
     }
 }
 
-fn spawn_segment(commands: &mut Commands, pos: Pos) -> Entity {
-    commands
-        .spawn_bundle(SpriteBundle {
-            sprite: Sprite {
-                color: SNAKE_TAIL_COLOR,
-                ..default()
-            },
-            ..default()
-        })
-        .insert(SnakeSegment)
-        .insert(pos)
-        .insert(SNAKE_TAIL_SEGMENT_SIZE)
-        .id()
-}
-
-fn spawn_snake(mut commands: Commands, mut snake_body: ResMut<SnakeBody>) {
+fn snake_spawn(mut commands: Commands, mut snake_body: ResMut<SnakeBody>) {
     let head = commands
         .spawn_bundle(SpriteBundle {
             sprite: Sprite {
@@ -146,4 +131,19 @@ fn snake_grow(
     if eat_event_reader.iter().next().is_some() {
         body.push(spawn_segment(&mut commands, last_tail_pos.0));
     }
+}
+
+fn spawn_segment(commands: &mut Commands, pos: Pos) -> Entity {
+    commands
+        .spawn_bundle(SpriteBundle {
+            sprite: Sprite {
+                color: SNAKE_TAIL_COLOR,
+                ..default()
+            },
+            ..default()
+        })
+        .insert(SnakeSegment)
+        .insert(pos)
+        .insert(SNAKE_TAIL_SEGMENT_SIZE)
+        .id()
 }
