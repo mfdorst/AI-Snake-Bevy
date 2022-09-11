@@ -17,7 +17,7 @@ pub struct Food;
 
 pub struct EatEvent;
 
-#[derive(Component, Default, Clone, Copy, PartialEq, Eq)]
+#[derive(Component, Default, Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Pos {
     pub x: i32,
     pub y: i32,
@@ -28,6 +28,13 @@ pub struct SnakeBody(pub Vec<Entity>);
 
 #[derive(Default)]
 pub struct LastTailPos(pub Pos);
+
+#[derive(Eq, PartialEq)]
+pub enum GameState {
+    Playing,
+    // Paused,
+    Lost,
+}
 
 #[derive(Eq, PartialEq, Clone, Copy)]
 pub enum Direction {

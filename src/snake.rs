@@ -76,10 +76,14 @@ fn snake_direction_input(
 
 fn snake_move(
     body: Res<SnakeBody>,
+    game_state: Res<GameState>,
     mut last_tail_pos: ResMut<LastTailPos>,
     mut head_query: Query<(Entity, &mut SnakeHead)>,
     mut pos_query: Query<&mut Pos>,
 ) {
+    if *game_state == GameState::Lost {
+        return;
+    }
     let (head_entity, mut head) = head_query.single_mut();
     // Finalize the movement direction
     head.prev_dir = head.next_dir;
