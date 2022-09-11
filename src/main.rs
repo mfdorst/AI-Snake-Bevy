@@ -7,9 +7,9 @@ mod food;
 mod grid_transform;
 mod snake;
 
-use consts::*;
-use components::GameState;
 use collision::CollisionPlugin;
+use components::GameState;
+use consts::*;
 use food::FoodPlugin;
 use grid_transform::GridTransformPlugin;
 use snake::SnakePlugin;
