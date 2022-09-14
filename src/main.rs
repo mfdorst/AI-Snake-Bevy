@@ -5,6 +5,7 @@ mod components;
 mod consts;
 mod food;
 mod grid_transform;
+mod pathfinding;
 mod snake;
 
 use collision::CollisionPlugin;

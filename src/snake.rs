@@ -1,6 +1,6 @@
 use bevy::{prelude::*, time::FixedTimestep};
 
-use super::components::{Direction, *};
+use super::components::*;
 use super::consts::*;
 
 pub struct SnakePlugin;
@@ -58,13 +58,13 @@ fn snake_direction_input(
 ) {
     if let Some(mut head) = head_query.iter_mut().next() {
         let dir = if keyboard_input.pressed(KeyCode::Left) {
-            Direction::Left
+            Dir::Left
         } else if keyboard_input.pressed(KeyCode::Right) {
-            Direction::Right
+            Dir::Right
         } else if keyboard_input.pressed(KeyCode::Up) {
-            Direction::Up
+            Dir::Up
         } else if keyboard_input.pressed(KeyCode::Down) {
-            Direction::Down
+            Dir::Down
         } else {
             head.next_dir
         };
@@ -95,16 +95,16 @@ fn snake_move(
     }
     let mut head_pos = pos_query.get_mut(head_entity).unwrap();
     match head.next_dir {
-        Direction::Left => {
+        Dir::Left => {
             head_pos.x -= 1;
         }
-        Direction::Right => {
+        Dir::Right => {
             head_pos.x += 1;
         }
-        Direction::Down => {
+        Dir::Down => {
             head_pos.y -= 1;
         }
-        Direction::Up => {
+        Dir::Up => {
             head_pos.y += 1;
         }
     }
