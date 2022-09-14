@@ -87,7 +87,7 @@ impl Pos {
 
 #[cfg(test)]
 mod test {
-    use super::{*, Dir};
+    use super::{Dir, *};
 
     #[test]
     fn pos_in_direction() {

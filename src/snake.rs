@@ -2,6 +2,7 @@ use bevy::{prelude::*, time::FixedTimestep};
 
 use super::components::*;
 use super::consts::*;
+use super::pathfinding::find_path;
 
 pub struct SnakePlugin;
 
@@ -12,6 +13,7 @@ impl Plugin for SnakePlugin {
             .add_event::<EatEvent>()
             .add_startup_system(snake_spawn)
             .add_system(snake_direction_input.before(snake_move))
+            .add_system(snake_pathfinding)
             .add_system_set(
                 SystemSet::new()
                     .with_run_criteria(FixedTimestep::step(MOVE_DELAY))
@@ -20,6 +22,22 @@ impl Plugin for SnakePlugin {
                     .with_system(snake_grow.after(snake_eat)),
             );
     }
+}
+
+fn snake_pathfinding(
+    snake_body: ResMut<SnakeBody>,
+    pos_query: Query<&Pos>,
+    food_query: Query<&Pos, With<Food>>,
+    mut snake_head_query: Query<&mut SnakeHead>,
+) {
+    let food = food_query.single();
+    let mut body = Vec::with_capacity(snake_body.0.len());
+    for segment in snake_body.0.iter() {
+        body.push(*pos_query.get(*segment).unwrap());
+    }
+    let path = find_path(body, *food);
+    let mut head = snake_head_query.single_mut();
+    head.next_dir = path[0];
 }
 
 fn snake_spawn(mut commands: Commands, mut snake_body: ResMut<SnakeBody>) {
